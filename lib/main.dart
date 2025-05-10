@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Automata App',
+      debugShowCheckedModeBanner: false, // Remove debug banner
       theme: ThemeData(
         primarySwatch: Colors.blue,
         useMaterial3: true,
@@ -119,17 +120,16 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
     final String input1 = _numberInputController.text.trim();
     final String input2 = _secondNumberInputController.text.trim();
 
+    // --- Enhanced Input Validation ---
     if (input1.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter the first number.")),
-      );
+      _showErrorSnackBar("Please enter the first number.");
       return;
     }
 
     int? n1 = int.tryParse(input1);
     if (n1 == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Invalid format for the first number.")),
+      _showErrorSnackBar(
+        "Invalid format for the first number. Please enter a whole number.",
       );
       return;
     }
@@ -137,21 +137,48 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
     int? n2;
     if (_showSecondInput) {
       if (input2.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please enter the second number.")),
+        _showErrorSnackBar(
+          "Please enter the second number for the Euclidean Algorithm.",
         );
         return;
       }
       n2 = int.tryParse(input2);
       if (n2 == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Invalid format for the second number."),
-          ),
+        _showErrorSnackBar(
+          "Invalid format for the second number. Please enter a whole number.",
         );
         return;
       }
     }
+
+    // Algorithm-specific validation
+    switch (_selectedSequence) {
+      case SequenceType.fibonacci:
+      case SequenceType.lucas:
+      case SequenceType.tribonacci:
+        if (n1 <= 0) {
+          _showErrorSnackBar("Number of terms must be a positive number.");
+          return;
+        }
+        break;
+      case SequenceType.collatz:
+        if (n1 <= 0) {
+          _showErrorSnackBar(
+            "Starting number for Collatz sequence must be positive.",
+          );
+          return;
+        }
+        break;
+      case SequenceType.euclidean:
+        if (n1 <= 0 || (n2 != null && n2 <= 0)) {
+          _showErrorSnackBar(
+            "Both numbers for Euclidean Algorithm must be positive.",
+          );
+          return;
+        }
+        break;
+    }
+    // --- End of Enhanced Input Validation ---
 
     setState(() {
       _isLoading = true;
@@ -188,12 +215,30 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
     });
   }
 
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.redAccent,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_sequenceTitle),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(
+          _sequenceTitle,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.blue.shade500, // Darker blue for AppBar
+        elevation: 4.0, // Add some elevation
+        centerTitle: false, // Center title
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
