@@ -345,13 +345,14 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
                     TextFormField(
                       controller: _numberInputController,
                       decoration: InputDecoration(
-                        labelText: _selectedSequence == SequenceType.pascal
-                            ? "Number of rows"
-                            : _selectedSequence == SequenceType.collatz
+                        labelText:
+                            _selectedSequence == SequenceType.pascal
+                                ? "Number of rows"
+                                : _selectedSequence == SequenceType.collatz
                                 ? "Starting number"
                                 : _showSecondInput
-                                    ? "First number (a)"
-                                    : "Number of terms",
+                                ? "First number (a)"
+                                : "Number of terms",
                         border: const OutlineInputBorder(),
                         prefixIcon: const Icon(Icons.format_list_numbered),
                       ),
