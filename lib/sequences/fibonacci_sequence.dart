@@ -23,7 +23,7 @@ String generateFibonacci(int n) {
     b = next;
   }
 
-  steps.add("\nFirst $n Fibonacci numbers:");
+  steps.add("First $n Fibonacci numbers:");
   steps.add(formatSequence(sequence));
   return steps.join("\n");
 }

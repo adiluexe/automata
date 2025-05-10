@@ -24,7 +24,7 @@ String generateLucas(int n) {
     b = next;
   }
 
-  steps.add("\nFirst $n Lucas numbers:");
+  steps.add("First $n Lucas numbers:");
   steps.add(formatSequence(sequence));
   return steps.join("\n");
 }

@@ -27,6 +27,6 @@ String generateEuclidean(int a, int b) {
     num2 = remainder;
   }
 
-  steps.add("\nThe GCD is $num1");
+  steps.add("The GCD is $num1");
   return steps.join("\n");
 }

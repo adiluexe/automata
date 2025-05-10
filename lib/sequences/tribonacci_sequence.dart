@@ -28,7 +28,7 @@ String generateTribonacci(int n) {
     c = next;
   }
 
-  steps.add("\nFirst $n Tribonacci numbers:");
+  steps.add("First $n Tribonacci numbers:");
   steps.add(formatSequence(sequence));
   return steps.join("\n");
 }

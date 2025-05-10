@@ -205,7 +205,8 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Container(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
                 height: 120,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
@@ -298,6 +299,13 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
                     Center(
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _generateSequence,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 30,
+                            vertical: 15,
+                          ),
+                          textStyle: const TextStyle(fontSize: 16),
+                        ),
                         child:
                             _isLoading
                                 ? const SizedBox(
@@ -317,7 +325,12 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
             ),
             const SizedBox(height: 24),
             if (_isLoading)
-              const Center(child: CircularProgressIndicator())
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: CircularProgressIndicator(),
+                ),
+              )
             else if (_resultText.isNotEmpty)
               Card(
                 child: Padding(
@@ -326,7 +339,7 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _sequenceTitle + " Result",
+                        "$_sequenceTitle Result",
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -360,6 +373,9 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
       onChanged: (SequenceType? value) {
         if (value != null) {
           _updateSequenceDetails(value);
+          // Clear input fields when sequence type changes for better UX
+          _numberInputController.clear();
+          _secondNumberInputController.clear();
         }
       },
       activeColor: Colors.blue,

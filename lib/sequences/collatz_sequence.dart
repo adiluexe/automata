@@ -32,10 +32,10 @@ String generateCollatz(int n) {
 
   if (current != 1) {
     steps.add(
-      "\nSequence did not reach 1 within $iteration iterations. Showing partial sequence.",
+      "Sequence did not reach 1 within $iteration iterations. Showing partial sequence.",
     );
   } else {
-    steps.add("\nSequence reached 1.");
+    steps.add("Sequence reached 1.");
   }
 
   steps.add("Collatz sequence:");
