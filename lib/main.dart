@@ -3,6 +3,7 @@ import 'sequences/collatz_sequence.dart';
 import 'sequences/euclidean_algorithm.dart';
 import 'sequences/fibonacci_sequence.dart';
 import 'sequences/lucas_sequence.dart';
+import 'sequences/pascal_sequence.dart'; // Added import
 import 'sequences/tribonacci_sequence.dart';
 
 void main() {
@@ -60,7 +61,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
-enum SequenceType { fibonacci, lucas, tribonacci, collatz, euclidean }
+enum SequenceType {
+  fibonacci,
+  lucas,
+  tribonacci,
+  collatz,
+  euclidean,
+  pascal,
+} // Added pascal
 
 class AutomataHomePage extends StatefulWidget {
   const AutomataHomePage({super.key});
@@ -111,6 +119,10 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
         case SequenceType.euclidean:
           _sequenceTitle = "Euclidean Algorithm";
           _showSecondInput = true;
+          break;
+        case SequenceType.pascal: // Added case for Pascal
+          _sequenceTitle = "Pascal's Triangle";
+          _showSecondInput = false;
           break;
       }
     });
@@ -177,6 +189,14 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
           return;
         }
         break;
+      case SequenceType.pascal: // Added case for Pascal
+        if (n1 <= 0) {
+          _showErrorSnackBar(
+            "Number of rows for Pascal's Triangle must be positive.",
+          );
+          return;
+        }
+        break;
     }
     // --- End of Enhanced Input Validation ---
 
@@ -206,6 +226,9 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
           } else {
             result = generateEuclidean(n1, n2);
           }
+          break;
+        case SequenceType.pascal: // Added case for Pascal
+          result = generatePascalTriangle(n1);
           break;
       }
       setState(() {
@@ -312,6 +335,11 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
                     _buildRadioOption(
                       SequenceType.euclidean,
                       "Euclidean Algorithm",
+                    ),
+                    _buildRadioOption(
+                      // Added RadioOption for Pascal
+                      SequenceType.pascal,
+                      "Pascal's Triangle",
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
