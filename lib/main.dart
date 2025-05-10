@@ -7,116 +7,391 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Automata App',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue,
+          brightness: Brightness.light,
+        ).copyWith(background: Colors.grey[100]),
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+          ),
+          hintStyle: const TextStyle(color: Colors.blue),
+          labelStyle: const TextStyle(color: Colors.blue),
+          iconColor: Colors.blue,
+          prefixIconColor: Colors.blue,
+          suffixIconColor: Colors.blue,
+        ),
+        cardTheme: CardTheme(
+          elevation: 2.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+            side: BorderSide(color: Colors.blue.shade200, width: 1.0),
+          ),
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+          ),
+        ),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const AutomataHomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+enum SequenceType { fibonacci, lucas, tribonacci, collatz, euclidean }
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class AutomataHomePage extends StatefulWidget {
+  const AutomataHomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<AutomataHomePage> createState() => _AutomataHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _AutomataHomePageState extends State<AutomataHomePage> {
+  SequenceType _selectedSequence = SequenceType.fibonacci;
+  final TextEditingController _numberInputController = TextEditingController();
+  final TextEditingController _secondNumberInputController =
+      TextEditingController();
 
-  void _incrementCounter() {
+  bool _showSecondInput = false;
+  String _sequenceTitle = "Fibonacci Sequence";
+  String _resultText = "";
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateSequenceDetails(_selectedSequence);
+  }
+
+  void _updateSequenceDetails(SequenceType? sequenceType) {
+    if (sequenceType == null) return;
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _selectedSequence = sequenceType;
+      _resultText = ""; // Clear previous results
+      switch (sequenceType) {
+        case SequenceType.fibonacci:
+          _sequenceTitle = "Fibonacci Sequence";
+          _showSecondInput = false;
+          break;
+        case SequenceType.lucas:
+          _sequenceTitle = "Lucas Numbers";
+          _showSecondInput = false;
+          break;
+        case SequenceType.tribonacci:
+          _sequenceTitle = "Tribonacci Sequence";
+          _showSecondInput = false;
+          break;
+        case SequenceType.collatz:
+          _sequenceTitle = "Collatz Sequence";
+          _showSecondInput = false;
+          break;
+        case SequenceType.euclidean:
+          _sequenceTitle = "Euclidean Algorithm";
+          _showSecondInput = true;
+          break;
+      }
     });
+  }
+
+  void _generateSequence() {
+    // Logic to be implemented
+    final String input1 = _numberInputController.text.trim();
+    final String input2 = _secondNumberInputController.text.trim();
+
+    if (input1.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter the first number.")),
+      );
+      return;
+    }
+
+    int? n1 = int.tryParse(input1);
+    if (n1 == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Invalid format for the first number.")),
+      );
+      return;
+    }
+
+    int? n2;
+    if (_showSecondInput) {
+      if (input2.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please enter the second number.")),
+        );
+        return;
+      }
+      n2 = int.tryParse(input2);
+      if (n2 == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Invalid format for the second number."),
+          ),
+        );
+        return;
+      }
+    }
+
+    setState(() {
+      _isLoading = true;
+      _resultText = "";
+    });
+
+    // Simulate background work
+    Future.delayed(const Duration(seconds: 1), () {
+      String result = "";
+      switch (_selectedSequence) {
+        case SequenceType.fibonacci:
+          result = _generateFibonacci(n1);
+          break;
+        // Other cases will be added later
+        default:
+          result = "Algorithm not yet implemented for $_sequenceTitle.";
+      }
+      setState(() {
+        _resultText = result;
+        _isLoading = false;
+      });
+    });
+  }
+
+  String _generateFibonacci(int n) {
+    if (n <= 0) return "Number of terms must be positive.";
+    if (n > 40)
+      return "For performance, n is limited to 40 for Fibonacci."; // Limit for simplicity
+    List<String> steps = [];
+    steps.add("Generating Fibonacci Sequence for $n terms");
+
+    int a = 0, b = 1;
+    steps.add("Starting with F(0) = 0, F(1) = 1");
+
+    List<int> sequence = [];
+    if (n >= 1) sequence.add(a);
+    if (n >= 2) sequence.add(b);
+
+    for (int i = 2; i < n; i++) {
+      int next = a + b;
+      sequence.add(next);
+      a = b;
+      b = next;
+    }
+    steps.add("\nFirst $n Fibonacci numbers:");
+    steps.add(_formatSequence(sequence));
+    return steps.join("\\n");
+  }
+
+  String _formatSequence(List<int> sequence) {
+    return sequence.join(", ");
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
+        title: Text(_sequenceTitle),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            // Header Card (Simplified)
+            Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Container(
+                height: 120,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: LinearGradient(
+                    colors: [Colors.blue.shade300, Colors.blue.shade600],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                padding: const EdgeInsets.all(16),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Automata Explorer",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      "Select an algorithm and generate sequences",
+                      style: TextStyle(fontSize: 14, color: Colors.white70),
+                    ),
+                  ],
+                ),
+              ),
             ),
+            const SizedBox(height: 16),
+
+            // Input Card
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    const Text(
+                      "Select a sequence",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(width: 40, height: 3, color: Colors.blue),
+                    const SizedBox(height: 16),
+                    _buildRadioOption(
+                      SequenceType.fibonacci,
+                      "Fibonacci Sequence",
+                    ),
+                    _buildRadioOption(SequenceType.lucas, "Lucas Numbers"),
+                    _buildRadioOption(
+                      SequenceType.tribonacci,
+                      "Tribonacci Sequence",
+                    ),
+                    _buildRadioOption(SequenceType.collatz, "Collatz Sequence"),
+                    _buildRadioOption(
+                      SequenceType.euclidean,
+                      "Euclidean Algorithm",
+                    ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      controller: _numberInputController,
+                      decoration: InputDecoration(
+                        labelText:
+                            _showSecondInput
+                                ? "First number (a)"
+                                : "Number of terms",
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.format_list_numbered),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    if (_showSecondInput) ...[
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _secondNumberInputController,
+                        decoration: const InputDecoration(
+                          labelText: "Second number (b)",
+                          border: OutlineInputBorder(),
+                          prefixIcon: const Icon(
+                            Icons.format_list_numbered_rtl,
+                          ),
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _generateSequence,
+                        child:
+                            _isLoading
+                                ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                                : const Text("Generate"),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Result Card
+            if (_isLoading)
+              const Center(child: CircularProgressIndicator())
+            else if (_resultText.isNotEmpty)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _sequenceTitle + " Result",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Container(width: 30, height: 2, color: Colors.blue),
+                      const SizedBox(height: 12),
+                      SelectableText(
+                        _resultText.replaceAll(
+                          "\\\\n",
+                          "\\n",
+                        ), // Ensure newlines are rendered
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Widget _buildRadioOption(SequenceType type, String title) {
+    return RadioListTile<SequenceType>(
+      title: Text(title),
+      value: type,
+      groupValue: _selectedSequence,
+      onChanged: (SequenceType? value) {
+        if (value != null) {
+          _updateSequenceDetails(value);
+        }
+      },
+      activeColor: Colors.blue,
+      contentPadding: EdgeInsets.zero,
+    );
+  }
+
+  @override
+  void dispose() {
+    _numberInputController.dispose();
+    _secondNumberInputController.dispose();
+    super.dispose();
   }
 }
