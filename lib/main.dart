@@ -346,7 +346,9 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
                       controller: _numberInputController,
                       decoration: InputDecoration(
                         labelText:
-                            _showSecondInput
+                            _selectedSequence == SequenceType.pascal
+                                ? "Number of rows"
+                                : _showSecondInput
                                 ? "First number (a)"
                                 : "Number of terms",
                         border: const OutlineInputBorder(),
