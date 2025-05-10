@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'sequences/collatz_sequence.dart';
+import 'sequences/euclidean_algorithm.dart';
+import 'sequences/fibonacci_sequence.dart';
+import 'sequences/lucas_sequence.dart';
+import 'sequences/tribonacci_sequence.dart';
 
 void main() {
   runApp(const MyApp());
@@ -111,7 +116,6 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
   }
 
   void _generateSequence() {
-    // Logic to be implemented
     final String input1 = _numberInputController.text.trim();
     final String input2 = _secondNumberInputController.text.trim();
 
@@ -154,51 +158,34 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
       _resultText = "";
     });
 
-    // Simulate background work
     Future.delayed(const Duration(seconds: 1), () {
       String result = "";
       switch (_selectedSequence) {
         case SequenceType.fibonacci:
-          result = _generateFibonacci(n1);
+          result = generateFibonacci(n1);
           break;
-        // Other cases will be added later
-        default:
-          result = "Algorithm not yet implemented for $_sequenceTitle.";
+        case SequenceType.lucas:
+          result = generateLucas(n1);
+          break;
+        case SequenceType.tribonacci:
+          result = generateTribonacci(n1);
+          break;
+        case SequenceType.collatz:
+          result = generateCollatz(n1);
+          break;
+        case SequenceType.euclidean:
+          if (n2 == null) {
+            result = "Second number is required for Euclidean Algorithm.";
+          } else {
+            result = generateEuclidean(n1, n2);
+          }
+          break;
       }
       setState(() {
         _resultText = result;
         _isLoading = false;
       });
     });
-  }
-
-  String _generateFibonacci(int n) {
-    if (n <= 0) return "Number of terms must be positive.";
-    if (n > 40)
-      return "For performance, n is limited to 40 for Fibonacci."; // Limit for simplicity
-    List<String> steps = [];
-    steps.add("Generating Fibonacci Sequence for $n terms");
-
-    int a = 0, b = 1;
-    steps.add("Starting with F(0) = 0, F(1) = 1");
-
-    List<int> sequence = [];
-    if (n >= 1) sequence.add(a);
-    if (n >= 2) sequence.add(b);
-
-    for (int i = 2; i < n; i++) {
-      int next = a + b;
-      sequence.add(next);
-      a = b;
-      b = next;
-    }
-    steps.add("\nFirst $n Fibonacci numbers:");
-    steps.add(_formatSequence(sequence));
-    return steps.join("\\n");
-  }
-
-  String _formatSequence(List<int> sequence) {
-    return sequence.join(", ");
   }
 
   @override
@@ -213,7 +200,6 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            // Header Card (Simplified)
             Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
@@ -251,8 +237,6 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
               ),
             ),
             const SizedBox(height: 16),
-
-            // Input Card
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
@@ -332,8 +316,6 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Result Card
             if (_isLoading)
               const Center(child: CircularProgressIndicator())
             else if (_resultText.isNotEmpty)
@@ -354,10 +336,7 @@ class _AutomataHomePageState extends State<AutomataHomePage> {
                       Container(width: 30, height: 2, color: Colors.blue),
                       const SizedBox(height: 12),
                       SelectableText(
-                        _resultText.replaceAll(
-                          "\\\\n",
-                          "\\n",
-                        ), // Ensure newlines are rendered
+                        _resultText.replaceAll("\\n", "\n"),
                         style: const TextStyle(
                           fontSize: 16,
                           fontFamily: 'monospace',
